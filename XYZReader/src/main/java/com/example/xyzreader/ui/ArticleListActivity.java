@@ -7,9 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -20,13 +24,20 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -165,7 +176,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(final ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
@@ -188,7 +199,69 @@ public class ArticleListActivity extends ActionBarActivity implements
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
+
+            loadImage(holder);
+//            try {
+//                URL url = new URL(mCursor.getString(ArticleLoader.Query.PHOTO_URL));
+//                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//                connection.setDoInput(true);
+//                connection.connect();
+//                InputStream input = connection.getInputStream();
+//                Bitmap myBitmap = BitmapFactory.decodeStream(input);
+//                Palette palette = Palette.generate(myBitmap);
+//                int defaultColor = 0xFF333333;
+//                int color = palette.getVibrantColor(defaultColor);
+//                holder.linearLayout.setBackgroundColor(color);
+//                connection.disconnect();
+//            } catch (IOException e) {
+//                // Log exception
+//                Log.d("ERROR" , e.getMessage());
+//            }
+
+
+
+//            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+//                @Override
+//                public void onGenerated(Palette palette) {
+//                    int defaultColor = 0xFF333333;
+//                    int color = palette.getDarkVibrantColor(defaultColor);
+//                    holder.linearLayout.setBackgroundColor(color);
+//                }
+//            });
+
         }
+
+        public void loadImage(final ViewHolder holder) {
+
+            Picasso.with(getBaseContext()).load(mCursor.getString(ArticleLoader.Query.PHOTO_URL)).into(new Target() {
+                // ....
+
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom arg1) {
+                    // Pick arbitrary values for width and height
+//                    Bitmap resizedBitmap = getResizedBitmap(bitmap, newWidth, newHeight);
+//                    mImageView.setBitmap(resizedBitmap);
+                    Palette palette = Palette.generate(bitmap);
+                    int defaultColor = 0xFF333333;
+                    int color = palette.getVibrantColor(defaultColor);
+                    holder.linearLayout.setBackgroundColor(color);
+                    Log.d("colorrrrrrr" , String.valueOf(color));
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+
+                // ....
+            });
+        }
+
 
         @Override
         public int getItemCount() {
@@ -200,9 +273,11 @@ public class ArticleListActivity extends ActionBarActivity implements
         public DynamicHeightNetworkImageView thumbnailView;
         public TextView titleView;
         public TextView subtitleView;
+        LinearLayout linearLayout;
 
         public ViewHolder(View view) {
             super(view);
+            linearLayout = (LinearLayout) view.findViewById(R.id.line1Content);
             thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
