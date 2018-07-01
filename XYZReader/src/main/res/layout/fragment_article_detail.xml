@@ -46,21 +46,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:background="#333"
                     android:orientation="vertical"
                     android:paddingBottom="@dimen/detail_metabar_vert_padding"
                     android:paddingLeft="@dimen/detail_inner_horiz_margin"
                     android:paddingRight="@dimen/detail_inner_horiz_margin"
                     android:paddingTop="@dimen/detail_metabar_vert_padding">
 
-                    <ProgressBar
-                        style="?android:attr/progressBarStyleLarge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/progressBar"
-                        android:layout_gravity="center"
-                        android:visibility="gone"
-                        android:layout_alignParentBottom="true" />
+
 
                     <TextView
                         android:id="@+id/article_title"
@@ -70,7 +62,7 @@
                         android:fontFamily="sans-serif-condensed"
                         android:lineSpacingMultiplier="0.9"
                         android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
-                        android:textColor="#fff"
+                        android:textColor="@color/text"
                         android:textSize="@dimen/detail_title_text_size"
                         android:textStyle="bold" />
 
@@ -79,7 +71,7 @@
                         style="?android:attr/textAppearanceSmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#8fff" />
+                        android:textColor="@color/text_hint" />
                 </LinearLayout>
 
                 
@@ -99,6 +91,7 @@
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
+
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/nestedScrollView"

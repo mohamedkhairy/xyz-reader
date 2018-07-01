@@ -8,13 +8,12 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -23,8 +22,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -37,10 +34,6 @@ import com.example.xyzreader.data.UpdaterService;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,7 +46,7 @@ import java.util.GregorianCalendar;
  * activity presents a grid of items as cards.
  */
 public class ArticleListActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = ArticleListActivity.class.toString();
     private Toolbar mToolbar;
@@ -81,6 +74,7 @@ public class ArticleListActivity extends AppCompatActivity implements
         final View toolbarContainerView = findViewById(R.id.toolbar_container);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         getLoaderManager().initLoader(0, null, this);
@@ -120,7 +114,6 @@ public class ArticleListActivity extends AppCompatActivity implements
     };
 
     private void updateRefreshingUI() {
-//        Snackbar.make(coordinatorLayout , "  Refresh" , Snackbar.LENGTH_LONG ).show();
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
     }
 
@@ -143,6 +136,12 @@ public class ArticleListActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mRecyclerView.setAdapter(null);
+    }
+
+    @Override
+    public void onRefresh() {
+        refresh();
+        Snackbar.make(coordinatorLayout, R.string.refresh , Snackbar.LENGTH_LONG).show();
     }
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
@@ -209,33 +208,6 @@ public class ArticleListActivity extends AppCompatActivity implements
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
 
             loadImage(holder);
-//            try {
-//                URL url = new URL(mCursor.getString(ArticleLoader.Query.PHOTO_URL));
-//                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//                connection.setDoInput(true);
-//                connection.connect();
-//                InputStream input = connection.getInputStream();
-//                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-//                Palette palette = Palette.generate(myBitmap);
-//                int defaultColor = 0xFF333333;
-//                int color = palette.getVibrantColor(defaultColor);
-//                holder.linearLayout.setBackgroundColor(color);
-//                connection.disconnect();
-//            } catch (IOException e) {
-//                // Log exception
-//                Log.d("ERROR" , e.getMessage());
-//            }
-
-
-
-//            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-//                @Override
-//                public void onGenerated(Palette palette) {
-//                    int defaultColor = 0xFF333333;
-//                    int color = palette.getDarkVibrantColor(defaultColor);
-//                    holder.linearLayout.setBackgroundColor(color);
-//                }
-//            });
 
         }
 
@@ -246,9 +218,6 @@ public class ArticleListActivity extends AppCompatActivity implements
 
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom arg1) {
-                    // Pick arbitrary values for width and height
-//                    Bitmap resizedBitmap = getResizedBitmap(bitmap, newWidth, newHeight);
-//                    mImageView.setBitmap(resizedBitmap);
                     Palette palette = Palette.generate(bitmap);
                     int defaultColor = 0xFF333333;
                     int color = palette.getVibrantColor(defaultColor);
