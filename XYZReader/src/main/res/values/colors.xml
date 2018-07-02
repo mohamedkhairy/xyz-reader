@@ -23,4 +23,7 @@
     <color name="theme_accent">#007065</color>
     <color name="text">#efefef</color>
     <color name="text_hint">#9c9c9c</color>
+    <color name="background">#404040</color>
+    <color name="card_background">#646464</color>
+
 </resources>

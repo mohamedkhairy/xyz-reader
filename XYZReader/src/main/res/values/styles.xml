@@ -25,8 +25,10 @@
         <item name="android:textColorHint">@color/text_hint</item>
     </style>
 
-    <style name="Theme.Bacon.Detail">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
+
+
+    <style name="Theme.Bacon.Detail" parent="Theme.AppCompat.NoActionBar"/>
+
+
 
 </resources>
